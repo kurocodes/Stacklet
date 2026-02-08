@@ -12,6 +12,7 @@ You can use Stacklet for:
 - images
 - toasts
 - previews
+
 …and pretty much anything you want to stack 🪄
 
 ## 🛠️ Technologies
