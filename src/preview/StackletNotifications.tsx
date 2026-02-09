@@ -69,11 +69,16 @@ export default function StackletNotifications() {
     <div className="w-screen h-screen bg-[#f1f1f1] flex items-end justify-center">
       <div className="m-10">
         <div
-          className="bg-[#e5e5e5] rounded-3xl p-3 flex flex-col gap-4 overflow-hidden"
+          className="bg-[#e5e5e5] min-w-68 rounded-3xl p-3 flex flex-col gap-4 overflow-hidden"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <Stacklet open={isHovered} stackedFrom="start">
+          <Stacklet
+            open={isHovered}
+            stackedFrom="end"
+            align="backward"
+            itemSize={64}
+          >
             {notifications.map((notification) => (
               <Notification key={notification.id} notification={notification} />
             ))}
