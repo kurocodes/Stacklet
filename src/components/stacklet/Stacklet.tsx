@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import { AnimatePresence, motion, type Transition } from "motion/react";
 import React from "react";
 import type { Align, Direction, StackFrom } from "./types";
 import { useMeasure } from "./useMeasure";
@@ -20,11 +20,9 @@ interface StackletProps {
   direction?: Direction;
   align?: Align;
 
-  transition?: {
-    stiffness?: number;
-    damping?: number;
-    mass?: number;
-  };
+  transition?: Transition;
+  extraItemsDelay?: number;
+  extraItemsDuration?: number;
 }
 
 export function Stacklet({
@@ -40,9 +38,14 @@ export function Stacklet({
   direction = "down",
   align = "forward",
   transition = { stiffness: 360, damping: 25, mass: 1.2 },
+  extraItemsDelay = 0.01,
+  extraItemsDuration = 0.15,
 }: StackletProps) {
   const items = React.Children.toArray(children);
   const total = items.length;
+
+  const stackCount =
+    collapsedCount != null ? Math.min(collapsedCount, total) : total;
 
   const shouldMeasure = itemSize == null;
   const [firstItemRef, measuredItemSize] = useMeasure(shouldMeasure);
@@ -67,34 +70,57 @@ export function Stacklet({
       {items.map((child, index) => {
         const visualIndex = stackedFrom === "start" ? index : total - 1 - index;
 
-        if (!open && visualIndex >= visibleCount) {
-          return null;
+        const isStackItem = visualIndex < stackCount;
+        const isExtraItem = visualIndex >= stackCount;
+
+        if (isStackItem) {
+          const alignIndex =
+            align === "forward" ? visualIndex : visibleCount - 1 - visualIndex;
+
+          const offset = alignIndex * step * sign;
+          const position =
+            axis === "y" ? { y: offset, x: 0 } : { x: offset, y: 0 };
+
+          const scale = open ? 1 : 1 - visualIndex * scaleStep;
+          const opacity = open ? 1 : 1 - visualIndex * opacityStep;
+
+          return (
+            <motion.div
+              ref={isMeasureTarget ? firstItemRef : null}
+              key={index}
+              className="absolute inset-x-0 top-0"
+              initial={false}
+              animate={{ ...position, scale, opacity }}
+              transition={{ type: "spring", ...transition }}
+              style={{ zIndex: visibleCount - visualIndex }}
+            >
+              {child}
+            </motion.div>
+          );
         }
 
-        const alignIndex =
-          align === "forward" ? visualIndex : visibleCount - 1 - visualIndex;
-
-        const offset = alignIndex * step * sign;
-
-        const position =
-          axis === "y" ? { y: offset, x: 0 } : { x: offset, y: 0 };
-
-        const scale = open ? 1 : 1 - visualIndex * scaleStep;
-        const opacity = open ? 1 : 1 - visualIndex * opacityStep;
-
-        return (
-          <motion.div
-            ref={isMeasureTarget ? firstItemRef : null}
-            key={index}
-            className="absolute inset-x-0 top-0"
-            initial={false}
-            animate={{ ...position, scale, opacity }}
-            transition={{ type: "spring", ...transition }}
-            style={{ zIndex: visibleCount - visualIndex }}
-          >
-            {child}
-          </motion.div>
-        );
+        if (isExtraItem) {
+          if (isExtraItem) {
+            return (
+              <AnimatePresence key={index}>
+                {open && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{
+                      duration: extraItemsDuration,
+                      delay: extraItemsDelay, // ← important
+                    }}
+                    className="relative mb-1"
+                  >
+                    {child}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            );
+          }
+        }
       })}
     </motion.div>
   );
