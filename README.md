@@ -29,6 +29,7 @@ You can use Stacklet for:
 - Control stack growth direction (direction)
 - Control how items pile up (align)
 - Limit visible items when collapsed
+- Graceful handling of large item counts
 - Works with any trigger (hover, click, state, etc.)
 - Content-agnostic — not tied to notifications
 - Lightweight & reusable
@@ -99,10 +100,19 @@ You don’t need all of them — just the ones you care about.
 - `opacityStep?: number (default: 0.08)` </br>
   How much each stacked item fades.
 
-### Other
+### Large Lists & Extras
 
 - `collapsedCount?: number` </br>
-  Limits how many items are visible when collapsed.
+  Limits how many items participate in the stack when collapsed.
+
+- `extraItemsDelay?: number (default: 0.01)` </br>
+  Delay before extra (non-stacked) items fade in when expanded.
+
+- `extraItemsDuration?: number (default: 0.15)` </br>
+  Fade animation duration for extra items.
+
+> Extra items are intentionally not part of the stack animation. </br>
+> They fade in and out subtly to keep the stack animation clean and satisfying.
 
 ## 🚀 Usage
 
@@ -114,7 +124,9 @@ Here’s a simple example:
     open={isHovered}
     stackedFrom="start"
     direction="up"
+    align="forward"
     itemSize={64}
+    collapsedCount={3}
   >
     {items.map((item) => (
       <Item key={item.id} item={item} />
@@ -123,7 +135,7 @@ Here’s a simple example:
 </div>
 ```
 
-You control when it opens.
+You control when it opens. </br>
 Stacklet handles how it stacks and animates ✨
 
 ## 🧪 Running the Project
