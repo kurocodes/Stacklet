@@ -38,7 +38,7 @@ export function Stacklet({
   collapsedCount,
   direction = "down",
   align = "forward",
-  transition = { stiffness: 360, damping: 25, mass: 1.2 },
+  transition = { stiffness: 350, damping: 20, mass: 1 },
   extraItemsDelay = 0.01,
   extraItemsDuration = 0.15,
 }: StackletProps) {
@@ -50,12 +50,12 @@ export function Stacklet({
   const collapsedStackCount =
     collapsedCount != null ? Math.min(collapsedCount, total) : total;
 
+  const visibleCount =
+    !open && collapsedCount != null ? Math.min(collapsedCount, total) : total;
+
   const shouldMeasure = itemSize == null;
   const [firstItemRef, measuredItemSize] = useMeasure(shouldMeasure);
   const isMeasureTarget = shouldMeasure && measuredItemSize == null;
-
-  const visibleCount =
-    !open && collapsedCount != null ? Math.min(collapsedCount, total) : total;
 
   const resolvedItemSize = itemSize ?? measuredItemSize;
 

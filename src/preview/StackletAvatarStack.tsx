@@ -5,8 +5,8 @@ export default function StackletAvatarStack() {
   const { isHovered, bind } = useHoverDelay(140);
 
   return (
-    <div className="w-screen h-screen bg-[#f1f1f1] flex items-center justify-start">
-      <div className="m-10">
+    <div className="w-screen h-screen bg-[#f1f1f1] flex items-center justify-center">
+      <div className="m-10 w-45">
         <div className=" min-h-10 rounded-full" {...bind}>
           <Stacklet
             open={isHovered}
@@ -14,7 +14,7 @@ export default function StackletAvatarStack() {
             stackedFrom="start"
             align="forward"
             itemSize={40}
-            scaleStep={0.08}
+            scaleStep={0}
             opacityStep={0}
             collapsedSpacing={16}
             expandedSpacing={-8}

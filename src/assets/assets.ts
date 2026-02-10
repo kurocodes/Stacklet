@@ -1,3 +1,24 @@
+export const notifications = [
+  {
+    id: 1,
+    msg: "Orders Import failed",
+    time: "42s",
+    error: "TimeoutError at Step 2",
+  },
+  {
+    id: 2,
+    msg: "SLA Breach",
+    time: "2min 11s",
+    error: "Data enrichment",
+  },
+  {
+    id: 3,
+    msg: "Product sync auto-fixed",
+    time: "5min",
+    error: "404 on GET /products",
+  },
+];
+
 export const profiles = [
   {
     id: 1,

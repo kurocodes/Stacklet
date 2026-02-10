@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
 import { LuArrowUpRight } from "react-icons/lu";
 import { AnimatePresence, motion } from "motion/react";
-import { Stacklet } from "../components/stacklet";
+import { Stacklet, useHoverDelay } from "../components/stacklet";
+import { notifications } from "../assets/assets";
 
 type Notification = {
   id: string | number;
@@ -12,66 +12,15 @@ type Notification = {
 
 type NotificationProps = { notification: Notification };
 
-const notifications: Notification[] = [
-  {
-    id: 1,
-    msg: "Orders Import failed",
-    time: "42s",
-    error: "TimeoutError at Step 2",
-  },
-  {
-    id: 2,
-    msg: "SLA Breach",
-    time: "2min 11s",
-    error: "Data enrichment",
-  },
-  {
-    id: 3,
-    msg: "Product sync auto-fixed",
-    time: "5min",
-    error: "404 on GET /products",
-  },
-];
-
 export default function StackletNotifications() {
-  const [isHovered, setIsHovered] = useState<boolean>(false);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hoverDelayMs = 140;
-
-  useEffect(() => {
-    return () => {
-      if (hoverTimeoutRef.current) {
-        clearTimeout(hoverTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleMouseEnter = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-
-    hoverTimeoutRef.current = setTimeout(() => {
-      setIsHovered(true);
-      hoverTimeoutRef.current = null;
-    }, hoverDelayMs);
-  };
-
-  const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-      hoverTimeoutRef.current = null;
-    }
-    setIsHovered(false);
-  };
+  const { isHovered, bind } = useHoverDelay(140);
 
   return (
     <div className="w-screen h-screen bg-[#f1f1f1] flex items-end justify-center">
       <div className="m-10">
         <div
           className="bg-[#e5e5e5] min-w-68 rounded-3xl p-3 flex flex-col gap-4 overflow-hidden"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          {...bind}
         >
           <Stacklet
             open={isHovered}
