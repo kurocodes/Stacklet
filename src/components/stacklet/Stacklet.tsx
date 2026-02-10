@@ -2,7 +2,8 @@ import { AnimatePresence, motion, type Transition } from "motion/react";
 import React from "react";
 import type { Align, Direction, StackFrom } from "./types";
 import { useMeasure } from "./useMeasure";
-import { directionMap } from "./utils";
+import { anchorClassMap, directionMap } from "./utils";
+import { getAlignIndex, getVisualIndex } from "./math";
 
 interface StackletProps {
   open: boolean;
@@ -44,7 +45,9 @@ export function Stacklet({
   const items = React.Children.toArray(children);
   const total = items.length;
 
-  const stackCount =
+  // Items that belong to the collapsed "hero" stack.
+  // Extra items are handled separately to avoid visual popping.
+  const collapsedStackCount =
     collapsedCount != null ? Math.min(collapsedCount, total) : total;
 
   const shouldMeasure = itemSize == null;
@@ -55,29 +58,36 @@ export function Stacklet({
     !open && collapsedCount != null ? Math.min(collapsedCount, total) : total;
 
   const resolvedItemSize = itemSize ?? measuredItemSize;
-  const step = open ? resolvedItemSize! + expandedSpacing : collapsedSpacing;
-  const height = resolvedItemSize! + (visibleCount - 1) * step;
+
+  // Stack step is different when expanded vs collapsed.
+  // Expanded: full item size + spacing
+  // Collapsed: small offset only (overlap effect)
+  const stackStep = open
+    ? resolvedItemSize! + expandedSpacing
+    : collapsedSpacing;
+
+  const height = resolvedItemSize! + (visibleCount - 1) * stackStep;
 
   const { axis, sign } = directionMap[direction];
+  const isVertical = axis === "y";
 
   return (
     <motion.div
       className="relative w-full"
       initial={false}
-      animate={{ height }}
+      animate={isVertical ? { height } : { width: height }}
       transition={{ type: "spring", ...transition }}
     >
       {items.map((child, index) => {
-        const visualIndex = stackedFrom === "start" ? index : total - 1 - index;
+        const visualIndex = getVisualIndex(index, total, stackedFrom);
 
-        const isStackItem = visualIndex < stackCount;
-        const isExtraItem = visualIndex >= stackCount;
+        const isStackItem = visualIndex < collapsedStackCount;
+        const isExtraItem = visualIndex >= collapsedStackCount;
 
         if (isStackItem) {
-          const alignIndex =
-            align === "forward" ? visualIndex : visibleCount - 1 - visualIndex;
+          const alignIndex = getAlignIndex(visualIndex, visibleCount, align);
 
-          const offset = alignIndex * step * sign;
+          const offset = alignIndex * stackStep * sign;
           const position =
             axis === "y" ? { y: offset, x: 0 } : { x: offset, y: 0 };
 
@@ -88,7 +98,7 @@ export function Stacklet({
             <motion.div
               ref={isMeasureTarget ? firstItemRef : null}
               key={index}
-              className="absolute inset-x-0 top-0"
+              className={`absolute ${anchorClassMap[direction]}`}
               initial={false}
               animate={{ ...position, scale, opacity }}
               transition={{ type: "spring", ...transition }}
@@ -99,6 +109,8 @@ export function Stacklet({
           );
         }
 
+        // Extra items fade in/out separately so they don't
+        // visually pop from behind the collapsed stack.
         if (isExtraItem) {
           if (isExtraItem) {
             return (
@@ -110,7 +122,7 @@ export function Stacklet({
                     exit={{ opacity: 0 }}
                     transition={{
                       duration: extraItemsDuration,
-                      delay: extraItemsDelay, // ← important
+                      delay: extraItemsDelay,
                     }}
                     className="relative mb-1"
                   >
