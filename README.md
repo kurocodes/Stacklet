@@ -28,8 +28,10 @@ You can use Stacklet for:
 - Control which item stays on top (stackedFrom)
 - Control stack growth direction (direction)
 - Control how items pile up (align)
+- Vertical and horizontal stacks (auto layout handling)
 - Limit visible items when collapsed
 - Graceful handling of large item counts
+- Extra items fade in/out (no visual popping)
 - Works with any trigger (hover, click, state, etc.)
 - Content-agnostic — not tied to notifications
 - Lightweight & reusable
@@ -83,7 +85,8 @@ You don’t need all of them — just the ones you care about.
 ### Spacing & Size
 
 - `itemSize?: number` </br>
-  Height (or width, for horizontal stacks) of one item. </br>
+  Size of one item along the stack axis </br>
+  (height for vertical stacks, width for horizontal stacks). </br>
   Recommended for stable layouts (no reflow).
 
 - `expandedSpacing?: number (default: 8)` </br>
@@ -148,7 +151,16 @@ Then open your browser and enjoy the stack magic 🪄
 
 ## 👀 Preview
 
-https://github.com/user-attachments/assets/cd37e04f-7e26-4e95-a4bf-e5724d9fe96f
+<table>
+  <tr>
+    <td>
+      <video src="https://github.com/user-attachments/assets/cd37e04f-7e26-4e95-a4bf-e5724d9fe96f" controls></video>
+    </td>
+    <td>
+      <video src="https://github.com/user-attachments/assets/2216ad7e-974f-4a65-b1df-18b94f86d726" controls></video>
+    </td>
+  </tr>
+</table>
 
 ## 💖 Final Note
 
